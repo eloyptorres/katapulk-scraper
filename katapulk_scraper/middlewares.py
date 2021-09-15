@@ -4,6 +4,10 @@
 # https://docs.scrapy.org/en/latest/topics/spider-middleware.html
 
 from scrapy import signals
+from scrapy.http import HtmlResponse
+from selenium import webdriver
+import time
+#from selenium.webdriver.support.ui import WebDriverWait
 
 # useful for handling different item types with a single interface
 from itemadapter import is_item, ItemAdapter
@@ -60,6 +64,11 @@ class KatapulkScraperDownloaderMiddleware:
     # Not all methods need to be defined. If a method is not defined,
     # scrapy acts as if the downloader middleware does not modify the
     # passed objects.
+    def __init__(self):
+        options = webdriver.FirefoxOptions()
+        options.add_argument('headless')
+        desired_capabilities = options.to_capabilities()
+        self.driver = webdriver.Firefox(desired_capabilities=desired_capabilities)
 
     @classmethod
     def from_crawler(cls, crawler):
@@ -69,16 +78,12 @@ class KatapulkScraperDownloaderMiddleware:
         return s
 
     def process_request(self, request, spider):
-        # Called for each request that goes through the downloader
-        # middleware.
-
-        # Must either:
-        # - return None: continue processing this request
-        # - or return a Response object
-        # - or return a Request object
-        # - or raise IgnoreRequest: process_exception() methods of
-        #   installed downloader middleware will be called
-        return None
+        self.driver.get(request.url)
+        self.driver.execute_script('window.scrollTo(0, document.body.scrollHeight)')
+        time.sleep(30)
+        body = self.driver.page_source
+        response = HtmlResponse(url=self.driver.current_url, body=body, encoding='utf-8')
+        return response
 
     def process_response(self, request, response, spider):
         # Called with the response returned from the downloader.
