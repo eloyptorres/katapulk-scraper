@@ -79,6 +79,10 @@ class KatapulkScraperDownloaderMiddleware:
 
     def process_request(self, request, spider):
         self.driver.get(request.url)
+        try:
+            self.driver.find_element_by_css_selector('html body.modal-open div div.fade.in.modal div.modal-dialog div.modal-content div.modal-footer button.button-secondary.button-small').click()
+        except:
+            pass
         self.driver.execute_script('window.scrollTo(0, document.body.scrollHeight)')
         time.sleep(30)
         body = self.driver.page_source
