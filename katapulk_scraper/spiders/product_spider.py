@@ -3,7 +3,7 @@ import json
 
 class ProductSpider(scrapy.Spider):
     name = 'products'
-    start_urls = ['https://www.katapulk.com/search?&zone_id=6']
+    start_urls = ['https://www.katapulk.com/']
 
     def parse(self, response):
         products = response.css('div.src-components-styles-components-___product-tile__textBlock___286s4')
