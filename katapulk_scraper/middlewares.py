@@ -6,6 +6,7 @@
 from scrapy import signals
 from scrapy.http import HtmlResponse
 from selenium import webdriver
+from selenium.common.exceptions import NoSuchElementException
 import time
 #from selenium.webdriver.support.ui import WebDriverWait
 
@@ -81,11 +82,13 @@ class KatapulkScraperDownloaderMiddleware:
         self.driver.get(request.url)
         try:
             self.driver.find_element_by_css_selector('html body.modal-open div div.fade.in.modal div.modal-dialog div.modal-content div.modal-footer button.button-secondary.button-small').click()
-        except:
+        except NoSuchElementException:
             pass
-        self.driver.execute_script('window.scrollTo(0, document.body.scrollHeight)')
-        time.sleep(30)
-        body = self.driver.page_source
+        previous_body = ''
+        while (body := self.driver.page_source) != previous_body:
+            previous_body = body
+            self.driver.execute_script('window.scrollTo(0, document.body.scrollHeight)')
+            time.sleep(5)
         response = HtmlResponse(url=self.driver.current_url, body=body, encoding='utf-8')
         return response
 
