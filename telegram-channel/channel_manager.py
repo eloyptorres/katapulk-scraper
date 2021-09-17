@@ -26,7 +26,7 @@ class UpdateChannel:
             pattern = re.compile('(?P<description>.*) (?P<price>\$.*)')
             stock = {match.group(1, 2) for match in pattern.finditer(text)}
         return stock
-    
+
     async def get_stock_changes(self, current_stock: set):
         last_stock = await self.get_last_stock()
         return (last_stock-current_stock, current_stock-last_stock) # (depleted_products, new_products)
@@ -41,7 +41,7 @@ class UpdateChannel:
         await self.save_stock(current_stock)
 
         if depleted_products: # notify about depleted products
-            text = '\n'.join(' '.join(self.depleted_emoji, prod) for prod in depleted_products)
+            text = '\n'.join(' '.join((self.depleted_emoji, *prod)) for prod in depleted_products)
             await self.client.send_message(settings.channel_id, text)
         
         for pseudo_product in new_products: # notify about new available products
