@@ -14,7 +14,7 @@ class ProductSpider(scrapy.Spider):
             price = product.css('div.src-components-styles-components-___product-tile__price___249i-::text').get()
             relative_url = product.css('h4.src-components-styles-components-___product-tile__titleCard___3kCr3 a::attr(href)').get()
             url = None if relative_url is None else response.urljoin(relative_url)
-            recognized_products[len(recognized_products)] = dict(title=title, description=description, price=price, url=url)
+            recognized_products[title+price] = dict(title=title, description=description, price=price, url=url)
 
         filename = 'products.json'
         with open(filename, 'w') as f:
