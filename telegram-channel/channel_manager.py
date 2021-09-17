@@ -4,14 +4,14 @@ import emoji
 from telethon import TelegramClient, sync
 from telethon.sessions import StringSession
 
-import settings
+from settings import API_HASH, API_ID, CHANNEL_ID, STORAGE_ID, TELEGRAM_SESSION
 
 
 class UpdateChannel:
     def __init__(self, products: dict):
         self.in_stock_emoji = emoji.emojize(':check_mark_button:')
         self.depleted_emoji = emoji.emojize(':cross_mark:')
-        self.client = TelegramClient(StringSession(settings.session), settings.api_id, settings.api_hash)
+        self.client = TelegramClient(StringSession(TELEGRAM_SESSION), API_ID, API_HASH)
         self.client.start()
         async def refresh_entities():
             await self.client.get_dialogs()
@@ -19,7 +19,7 @@ class UpdateChannel:
         self.client.loop.run_until_complete(self.update_channel(products))
 
     async def get_last_stock(self):
-        messages = await self.client.get_messages(settings.storage_id)
+        messages = await self.client.get_messages(STORAGE_ID)
         stock = set()
         if messages and messages[0].raw_text:
             text = messages[0].raw_text
@@ -33,7 +33,7 @@ class UpdateChannel:
 
     async def save_stock(self, stock):
         text = '\n'.join(' '.join(prod) for prod in sorted(stock))
-        await self.client.send_message(settings.storage_id, text)
+        await self.client.send_message(STORAGE_ID, text)
 
     async def update_channel(self, products: dict):
         current_stock = {(prod['title'], prod['price']) for prod in products.values()}
@@ -42,18 +42,19 @@ class UpdateChannel:
 
         if depleted_products: # notify about depleted products
             text = '\n'.join(' '.join((self.depleted_emoji, *prod)) for prod in depleted_products)
-            await self.client.send_message(settings.channel_id, text)
+            await self.client.send_message(CHANNEL_ID, text)
         
         for pseudo_product in new_products: # notify about new available products
             prod = products[''.join(pseudo_product)]
             text = f"{self.in_stock_emoji}[{prod['title']}]({prod['url']})\n{prod['description']}\n{prod['price']}"
-            await self.client.send_message(settings.channel_id, text)
+            await self.client.send_message(CHANNEL_ID, text)
 
 
 if __name__ == '__main__':
     import json
     import sys
     args = sys.argv[1:]
+    del sys
 
     if len(args) == 1:
         with open(args[0], 'r') as f:
