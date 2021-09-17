@@ -23,7 +23,7 @@ class UpdateChannel:
         stock = set()
         if messages and messages[0].raw_text:
             text = messages[0].raw_text
-            pattern = re.compile('(?P<description>.*) (?P<price>$.*)')
+            pattern = re.compile('(?P<description>.*) (?P<price>\$.*)')
             stock = {match.group(1, 2) for match in pattern.finditer(text)}
         return stock
     
