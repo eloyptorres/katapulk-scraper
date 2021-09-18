@@ -1,6 +1,9 @@
+import logging
 import subprocess
 
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
+
+logging.basicConfig(level=logging.WARNING)
 
 sched = AsyncIOScheduler()
 
