@@ -86,3 +86,10 @@ DOWNLOADER_MIDDLEWARES = {
 #HTTPCACHE_DIR = 'httpcache'
 #HTTPCACHE_IGNORE_HTTP_CODES = []
 #HTTPCACHE_STORAGE = 'scrapy.extensions.httpcache.FilesystemCacheStorage'
+
+import os
+
+FIREFOX_BIN = os.environ['FIREFOX_BIN']
+GECKODRIVER_PATH = os.environ['GECKODRIVER_PATH']
+
+del os

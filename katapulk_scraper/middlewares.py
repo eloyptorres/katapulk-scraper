@@ -3,15 +3,19 @@
 # See documentation in:
 # https://docs.scrapy.org/en/latest/topics/spider-middleware.html
 
+import time
+
 from scrapy import signals
 from scrapy.http import HtmlResponse
 from selenium import webdriver
 from selenium.common.exceptions import NoSuchElementException
-import time
+from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
 #from selenium.webdriver.support.ui import WebDriverWait
 
 # useful for handling different item types with a single interface
 from itemadapter import is_item, ItemAdapter
+
+from katapulk_scraper.settings import FIREFOX_BIN, GECKODRIVER_PATH
 
 
 class KatapulkScraperSpiderMiddleware:
@@ -67,9 +71,13 @@ class KatapulkScraperDownloaderMiddleware:
     # passed objects.
     def __init__(self):
         options = webdriver.FirefoxOptions()
-        options.add_argument('headless')
-        desired_capabilities = options.to_capabilities()
-        self.driver = webdriver.Firefox(desired_capabilities=desired_capabilities)
+        options.headless = True
+        binary = FirefoxBinary(FIREFOX_BIN)
+        self.driver = webdriver.Firefox(
+                firefox_binary=binary,
+                executable_path=GECKODRIVER_PATH,
+                options=options,
+                )
 
     @classmethod
     def from_crawler(cls, crawler):
