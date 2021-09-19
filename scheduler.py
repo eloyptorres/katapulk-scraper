@@ -1,11 +1,11 @@
 import logging
 import subprocess
 
-from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from apscheduler.schedulers.blocking import BlockingScheduler
 
 logging.basicConfig(level=logging.WARNING)
 
-sched = AsyncIOScheduler()
+sched = BlockingScheduler()
 
 @sched.scheduled_job('interval', minutes=15)
 def timed_job():
