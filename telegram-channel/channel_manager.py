@@ -1,10 +1,13 @@
+import logging
 import re
 
 import emoji
 from telethon import TelegramClient, sync
 from telethon.sessions import StringSession
 
-from settings import API_HASH, API_ID, CHANNEL_ID, STORAGE_ID, TELEGRAM_SESSION
+from settings import API_HASH, API_ID, CHANNEL_ID, LOGGING_LEVEL, STORAGE_ID, TELEGRAM_SESSION
+
+logging.basicConfig(format='[%(levelname) 5s/%(asctime)s] %(name)s: %(message)s', level=LOGGING_LEVEL)
 
 
 class UpdateChannel:
@@ -29,15 +32,29 @@ class UpdateChannel:
 
     async def get_stock_changes(self, current_stock: set):
         last_stock = await self.get_last_stock()
+        logging.info(f'Current stock size is {len(current_stock)}')
+        logging.info(f'Last stock size is {len(last_stock)}')
         return (last_stock-current_stock, current_stock-last_stock) # (depleted_products, new_products)
 
     async def save_stock(self, stock):
         text = '\n'.join(' '.join(prod) for prod in sorted(stock))
         await self.client.send_message(STORAGE_ID, text)
 
+    @staticmethod
+    def log_stock(products, related_information:str):
+        logging.info(f'Amount of {related_information}: {len(products)}')
+        for description, price in products:
+            logging.info(
+                f'{related_information}: [{description}]:h={hash(description)} '
+                f'[{price}]:h={hash(price)} tuple_hash={hash((description, price))}'
+                )
+
     async def update_channel(self, products: dict):
         current_stock = {(prod['title'], prod['price']) for prod in products.values()}
         depleted_products, new_products = await self.get_stock_changes(current_stock)
+        UpdateChannel.log_stock(depleted_products, 'depleted products')
+        UpdateChannel.log_stock(new_products, 'new products')
+
         await self.save_stock(current_stock)
 
         if depleted_products: # notify about depleted products
@@ -61,4 +78,4 @@ if __name__ == '__main__':
             products = json.load(f)
         UpdateChannel(products)
     else:
-        print(f'Expected 1 argument. Found {len(args)}.')
+        logging.error(f'Expected 1 process argument. Found {len(args)}.')
