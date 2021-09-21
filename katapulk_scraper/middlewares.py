@@ -94,10 +94,15 @@ class KatapulkScraperDownloaderMiddleware:
         except NoSuchElementException:
             pass
         previous_body = ''
-        while (body := self.driver.page_source) != previous_body:
+        good_selection = 0
+        while good_selection < 3:
+            if (body := self.driver.page_source) == previous_body:
+                good_selection += 1
+            else:
+                good_selection = 0
             previous_body = body
             self.driver.execute_script('window.scrollTo(0, document.body.scrollHeight)')
-            time.sleep(5)
+            time.sleep(1)
         response = HtmlResponse(url=self.driver.current_url, body=body, encoding='utf-8')
         return response
 
