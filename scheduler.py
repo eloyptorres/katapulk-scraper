@@ -4,7 +4,7 @@ import subprocess
 from apscheduler.schedulers.blocking import BlockingScheduler
 
 import os
-INTERVAL_MINUTES = os.environ.get('INTERVAL_MINUTES', 15)
+INTERVAL_MINUTES = int(os.environ.get('INTERVAL_MINUTES', 15))
 del os
 
 logging.basicConfig(level=logging.WARNING)
