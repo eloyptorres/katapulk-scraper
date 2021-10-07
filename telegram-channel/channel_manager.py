@@ -61,9 +61,11 @@ class UpdateChannel:
             text = '\n'.join(' '.join((self.depleted_emoji, *prod)) for prod in depleted_products)
             await self.client.send_message(CHANNEL_ID, text)
         
-        for pseudo_product in new_products: # notify about new available products
-            prod = products[''.join(pseudo_product)]
-            text = f"{self.in_stock_emoji}[{prod['title']}]({prod['url']})\n{prod['description']}\n{prod['price']}"
+        if new_products: # notify about new available products
+            text = ''
+            for pseudo_product in new_products:
+                prod = products[''.join(pseudo_product)]
+                text += f"{self.in_stock_emoji}[{prod['title']}]({prod['url']}) {prod['price']}\n"
             await self.client.send_message(CHANNEL_ID, text)
 
 
